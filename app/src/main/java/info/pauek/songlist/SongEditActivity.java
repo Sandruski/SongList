@@ -1,5 +1,6 @@
 package info.pauek.songlist;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -10,6 +11,8 @@ import java.util.GregorianCalendar;
 
 public class SongEditActivity extends AppCompatActivity {
 
+    EditText edit_title;
+    EditText edit_band;
     EditText edit_year;
 
     @Override
@@ -17,6 +20,8 @@ public class SongEditActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song_edit);
 
+        edit_title = findViewById(R.id.edit_title);
+        edit_band = findViewById(R.id.edit_band);
         edit_year = findViewById(R.id.edit_year);
 
         Calendar calendar = new GregorianCalendar();
@@ -34,5 +39,15 @@ public class SongEditActivity extends AppCompatActivity {
         int year = Integer.valueOf(edit_year.getText().toString());
         year++;
         edit_year.setText(Integer.toString(year));
+    }
+
+    public void onSave(View view) {
+
+        Intent data = new Intent();
+        data.putExtra("title", edit_title.getText().toString());
+        data.putExtra("band", edit_band.getText().toString());
+        data.putExtra("year", edit_year.getText().toString());
+        setResult(RESULT_OK, data);
+        finish();
     }
 }
