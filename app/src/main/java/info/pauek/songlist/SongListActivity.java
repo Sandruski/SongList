@@ -20,6 +20,7 @@ import java.util.List;
 public class SongListActivity extends AppCompatActivity {
 
     public static final int NEW_SONG = 0;
+    public static final int SELECTED_SONG = 1;
     private List<Song> songs;
     private RecyclerView song_list_view;
     private Adapter adapter;
@@ -39,6 +40,17 @@ public class SongListActivity extends AppCompatActivity {
         song_list_view.setAdapter(adapter);
     }
 
+    public void onClickSong(int position) {
+        Song song = songs.get(position);
+
+        Intent intent = new Intent(this, SongEditActivity.class);
+        intent.putExtra("title", song.getTitle());
+        intent.putExtra("band", song.getBand());
+        intent.putExtra("year", song.getYear());
+        intent.putExtra("index", position);
+        startActivityForResult(intent, SELECTED_SONG);
+    }
+
     class ViewHolder extends RecyclerView.ViewHolder {
         private TextView title_view;
         private TextView band_view;
@@ -49,10 +61,17 @@ public class SongListActivity extends AppCompatActivity {
             title_view = itemView.findViewById(R.id.title_view);
             band_view = itemView.findViewById(R.id.band_view);
             year_view = itemView.findViewById(R.id.year_view);
+            itemView.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    onClickSong(getAdapterPosition());
+                }
+            });
         }
     }
 
     class Adapter extends RecyclerView.Adapter<ViewHolder> {
+
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -71,6 +90,7 @@ public class SongListActivity extends AppCompatActivity {
         public int getItemCount() {
             return songs.size();
         }
+
     }
 
     @Override
@@ -103,8 +123,18 @@ public class SongListActivity extends AppCompatActivity {
                 songs.add(new Song(data.getStringExtra("title"), data.getStringExtra("band"), data.getStringExtra("year")));
                 adapter.notifyItemInserted(songs.size() - 1);
                 }
-
                 break;
+
+            case SELECTED_SONG:
+                if (resultCode == RESULT_OK) {
+                    int index = data.getIntExtra("index", -1);
+                    songs.get(index).setTitle(data.getStringExtra("title"));
+                    songs.get(index).setBand(data.getStringExtra("band"));
+                    songs.get(index).setYear(data.getStringExtra("year"));
+                    adapter.notifyItemChanged(index);
+                }
+                break;
+
             default:
                 super.onActivityResult(requestCode, resultCode, data);
         }
